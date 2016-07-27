@@ -1,7 +1,9 @@
 package qiaofei.com.coderinfoa.base;
 
+import android.app.Activity;
 import android.app.Application;
 import java.io.IOException;
+import java.util.LinkedList;
 import qiaofei.com.coderinfoa.injector.component.AppComponent;
 import qiaofei.com.coderinfoa.injector.component.DaggerAppComponent;
 import qiaofei.com.coderinfoa.injector.moudle.AppModule;
@@ -12,11 +14,13 @@ import qiaofei.com.coderinfoa.utils.cacheutils.DiskLruCacheHelper;
 /**
  * Created by QiaoFei on 2016/6/6.
  */
-//DaemonApplication
 public class MyApp extends Application {
+  //初始化缓存工具
   public static ACache mCache;
   public static DiskLruCacheHelper diskLruCacheHelper;
   public static AppComponent mAppComponent;
+  //保存每一个Activity实例
+  public static LinkedList<Activity> allActivities = new LinkedList<Activity>();
 
   @Override public void onCreate() {
     super.onCreate();

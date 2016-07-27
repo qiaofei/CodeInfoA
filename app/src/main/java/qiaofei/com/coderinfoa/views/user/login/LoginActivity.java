@@ -1,7 +1,6 @@
 package qiaofei.com.coderinfoa.views.user.login;
 
 import javax.inject.Inject;
-import qiaofei.com.coderinfoa.R;
 import qiaofei.com.coderinfoa.base.BaseActivity;
 
 /**
@@ -10,16 +9,16 @@ import qiaofei.com.coderinfoa.base.BaseActivity;
 public class LoginActivity extends BaseActivity implements LoginContract.MvpView {
   @Inject LoginPresenter loginPresenter;
 
-  protected int getLayoutId() {
-    return R.layout.activity_main;
+  @Override public int setContent() {
+    return 0;
   }
 
   @Override public void initInjector() {
-    mActivityComponent.inject(this);
-    loginPresenter.attachView(this);
+
   }
 
   @Override public void initData() {
+
   }
 
   @Override public void login() {

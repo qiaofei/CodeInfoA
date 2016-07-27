@@ -1,14 +1,11 @@
 package qiaofei.com.coderinfoa.base;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
-import android.view.Window;
+import android.widget.Toast;
 import butterknife.ButterKnife;
-import java.util.LinkedList;
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import qiaofei.com.coderinfoa.injector.component.ActivityComponent;
 import qiaofei.com.coderinfoa.injector.component.DaggerActivityComponent;
 import qiaofei.com.coderinfoa.injector.moudle.ActivityModule;
@@ -16,56 +13,72 @@ import qiaofei.com.coderinfoa.injector.moudle.ActivityModule;
 /**
  * Created by Administrator on 2015/9/19.
  */
-public abstract class BaseActivity extends AppCompatActivity {
-  public static LinkedList<Activity> sAllActivitys = new LinkedList<Activity>();
+public abstract class BaseActivity extends RxAppCompatActivity {
+
   protected ActivityComponent mActivityComponent;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
-    // 锁定竖屏
-    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     super.onCreate(savedInstanceState);
-    if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
-      finish();
-      return;
+    setActivityStatus();
+    //requestWindowFeature(Window.FEATURE_NO_TITLE);
+    if (setContent() != 0) {
+      setContentView(setContent());
     }
-    if (getLayoutId() != 0) {
-      setContentView(getLayoutId());
-    }
-    sAllActivitys.add(this);
     ButterKnife.bind(this);
-    mActivityComponent = DaggerActivityComponent.builder()
-        .appComponent(MyApp.mAppComponent)
-        .activityModule(new ActivityModule(this))
-        .build();
+    setActivityStatus();
+    initComponent();
     initInjector();
     initData();
   }
 
   /**
-   * 注入Injector
+   * 将当前Activity加入Activity列表中,并设置Activity属性
    */
-  public abstract void initInjector();
-
-  public void initData() {
+  public void setActivityStatus() {
+    MyApp.allActivities.add(this);
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
+      finish();
+      return;
+    }
   }
 
-  protected int getLayoutId() {
-    return 0;
+  /**
+   * 初始化ActivityComponent
+   */
+  public void initComponent() {
+    mActivityComponent = DaggerActivityComponent.builder()
+        .appComponent(MyApp.mAppComponent)
+        .activityModule(new ActivityModule(this))
+        .build();
+  }
+
+  /**
+   * 注入Injector
+   */
+
+  public abstract int setContent();
+
+  public abstract void initInjector();
+
+  public abstract void initData();
+
+  /**
+   * Toast 快捷方式
+   */
+  public void showToast(String text) {
+    if (text != null && !text.trim().equals("")) {
+      Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+    }
   }
 
   protected void onDestroy() {
+    MyApp.allActivities.remove(this);
     ButterKnife.unbind(this);
     super.onDestroy();
   }
 
-  public void closeAllActivity() {
-    for (Activity activity : sAllActivitys) {
-      activity.finish();
-      sAllActivitys.remove(activity);
-    }
-  }
-
+/*
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case android.R.id.home:
@@ -73,5 +86,5 @@ public abstract class BaseActivity extends AppCompatActivity {
         break;
     }
     return super.onOptionsItemSelected(item);
-  }
+  }*/
 }
