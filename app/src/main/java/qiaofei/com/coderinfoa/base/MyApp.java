@@ -3,6 +3,9 @@ package qiaofei.com.coderinfoa.base;
 import android.app.Application;
 import java.io.IOException;
 import qiaofei.com.coderinfoa.injector.component.AppComponent;
+import qiaofei.com.coderinfoa.injector.component.DaggerAppComponent;
+import qiaofei.com.coderinfoa.injector.moudle.AppModule;
+import qiaofei.com.coderinfoa.injector.moudle.NetworkModule;
 import qiaofei.com.coderinfoa.utils.cacheutils.ACache;
 import qiaofei.com.coderinfoa.utils.cacheutils.DiskLruCacheHelper;
 
@@ -23,6 +26,14 @@ public class MyApp extends Application {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    initializeInjector();
+  }
+
+  private void initializeInjector() {
+    mAppComponent = DaggerAppComponent.builder()
+        .appModule(new AppModule(this))
+        .networkModule(new NetworkModule())
+        .build();
   }
 }
 
